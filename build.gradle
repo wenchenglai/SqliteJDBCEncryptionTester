@@ -1,0 +1,41 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+	id 'java'
+}
+
+ext {
+	lombokVersion = '1.18.4'
+	jacksonDataformatYaml = '2.9.8'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.kla.bbp'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	flatDir {
+		dirs 'driver'
+	}
+
+	mavenCentral()
+}
+
+// exclude spring boot's logback inclusion
+configurations {
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
+}
+
+dependencies {
+	annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+	compile fileTree(dir: 'driver', include: ['*.jar'])
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDataformatYaml}"
+	implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDataformatYaml}"
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

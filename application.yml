@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: performance-tester
+
+  profiles:
+    active: default
+
+  connectionString: jdbc:sqlite:source.db
+
+---
+
+spring:
+  profiles: secure
+  password: kla
+  # cipherString: ?cipher=sqlcipher&legacy=4&legacy_page_size=4096&kdf_iter=256000&fast_kdf_iter=2&hmac_use=1&hmac_pgno=1&hmac_salt_mask=0x3a&kdf_algorithm=2&hmac_algorithm=2&plaintext_header_size=0
+  targetDbName: encrypted.db
+---
+spring:
+  profiles: default
+  targetDbName: plaintext.db
+  # cipherString:
