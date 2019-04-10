@@ -15,7 +15,7 @@ import java.time.Instant;
 
 @Service
 @Log4j2
-public class PerformanceTester {
+public class EncryptionTester {
     @Value("${spring.connectionString:jdbc:sqlite:source.db}")
     private String connString;
 
@@ -25,7 +25,7 @@ public class PerformanceTester {
     @Value("${spring.targetDbName:plaintext.db}")
     private String targetDbName;
 
-    public void GenerateNewDb() {
+    public void EncryptNewDb() {
         log.debug("connString = {}, password = {}, targetDbName = {}", connString, password, targetDbName);
         CleanUpBefore();
 
@@ -35,24 +35,15 @@ public class PerformanceTester {
         Instant start = Instant.now();
 
         try {
-            connection = DriverManager.getConnection(connString);
+            connection = DriverManager.getConnection(connString, "", password);
             Statement statement = connection.createStatement();
 
-            String sqlAttachNewDb;
-            if (password.isEmpty()) {
-                Object[] params = new Object[]{targetDbName};
-                sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget", params);
-            } else {
-                Object[] params = new Object[]{targetDbName, password};
-                sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget KEY ''{1}''", params);
-            }
+            statement.execute(String.format("PRAGMA key='%s'", password));
+            statement.executeUpdate("drop table if exists company");
+            statement.executeUpdate("create table company (id integer, name string)");
+            statement.executeUpdate("insert into company values(1, 'KLA2')");
+            statement.executeUpdate("insert into company values(2, 'XYZ')");
 
-
-            log.debug("SQL statement to attach new db file: " + sqlAttachNewDb);
-            statement.execute(sqlAttachNewDb);
-            statement.execute("CREATE TABLE newtarget.attribTable AS SELECT * FROM attribTable;");
-            statement.execute("CREATE TABLE newtarget.blobTable AS SELECT * FROM blobTable;");
-            statement.execute("DETACH DATABASE newtarget;");
             statement.close();
         } catch(SQLException e) {
             // if the error message is "out of memory",

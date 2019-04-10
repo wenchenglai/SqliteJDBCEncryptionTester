@@ -8,7 +8,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JdbctesterApplication implements CommandLineRunner {
 	@Autowired
-	private PerformanceTester tester;
+	private PerformanceTester performanceTester;
+
+	@Autowired
+	private EncryptionTester encryptionTester;
+
+	@Autowired
+	private DecryptionTester decryptionTester;
 
 	public static void main(String[] args) {
 		SpringApplication.run(JdbctesterApplication.class, args);
@@ -16,6 +22,8 @@ public class JdbctesterApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		tester.GenerateNewDb();
+		//performanceTester.GenerateNewDb();
+		encryptionTester.EncryptNewDb();
+		decryptionTester.DecryptNewDb();
 	}
 }
