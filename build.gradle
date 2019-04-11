@@ -39,3 +39,7 @@ dependencies {
 	implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDataformatYaml}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+bootRun {
+	jvmArgs = ["-Dspring.profiles.active=secure"]
+}
