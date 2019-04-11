@@ -9,7 +9,7 @@ import java.sql.*;
 @Log4j2
 public class DecryptionTester extends Tester {
     public void DecryptNewDb() {
-        this.TesterWrapper(connection -> {
+        this.TesterWrapper((connection, sqlAttach) -> {
             try {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM company LIMIT 1");

@@ -8,7 +8,7 @@ import java.sql.Statement;
 @Service
 public class EncryptionTester extends Tester {
     public void EncryptNewDb() {
-        this.TesterWrapper(connection -> {
+        this.TesterWrapper((connection, sqlAttach) -> {
             try {
                 Statement statement = connection.createStatement();
                 //statement.execute(String.format("PRAGMA key='%s'", password));

@@ -7,10 +7,10 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @Log4j2
 public class Tester {
@@ -23,7 +23,7 @@ public class Tester {
     @Value("${spring.targetDbName:plaintext.db}")
     private String targetDbName;
 
-    public void TesterWrapper(Consumer<Connection> consumer, Boolean needClean, String testName) {
+    public void TesterWrapper(BiConsumer<Connection, String> consumer, Boolean needClean, String testName) {
         log.debug("connString = {}, password = {}, targetDbName = {}", connString, password, targetDbName);
 
         if(needClean) {
@@ -32,13 +32,22 @@ public class Tester {
 
         Connection connection = null;
 
+        String sqlAttachNewDb;
+        if (password.isEmpty()) {
+            Object[] params = new Object[]{targetDbName};
+            sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget", params);
+        } else {
+            Object[] params = new Object[]{targetDbName, password};
+            sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget KEY ''{1}''", params);
+        }
+
         log.info("We are starting the {} test...", testName);
         Instant start = Instant.now();
 
         try {
             connection = DriverManager.getConnection(connString, "", password);
 
-            consumer.accept(connection);
+            consumer.accept(connection, sqlAttachNewDb);
         } catch(SQLException e) {
             // if the error message is "out of memory",
             // it probably means no database file is found
