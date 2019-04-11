@@ -25,5 +25,6 @@ public class JdbctesterApplication implements CommandLineRunner {
 		//performanceTester.GenerateNewDb();
 		encryptionTester.EncryptNewDb();
 		decryptionTester.DecryptNewDb();
+		decryptionTester.DecryptNewDbWithWrongPassword();
 	}
 }

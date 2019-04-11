@@ -20,8 +20,8 @@ public class PerformanceTester extends Tester {
                 statement.execute("DETACH DATABASE newtarget;");
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error(e.getLocalizedMessage());
             }
-        }, true, this.getClass().getSimpleName());
+        }, true, this.getClass().getSimpleName() + ".GenerateNewDb");
     }
 }
