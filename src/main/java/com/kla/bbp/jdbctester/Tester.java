@@ -2,20 +2,18 @@ package com.kla.bbp.jdbctester;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Consumer;
 
-@Service
 @Log4j2
-public class PerformanceTester {
+public class Tester {
     @Value("${spring.connectionString:jdbc:sqlite:source.db}")
     private String connString;
 
@@ -25,35 +23,22 @@ public class PerformanceTester {
     @Value("${spring.targetDbName:plaintext.db}")
     private String targetDbName;
 
-    public void GenerateNewDb() {
+    public void TesterWrapper(Consumer<Connection> consumer, Boolean needClean, String testName) {
         log.debug("connString = {}, password = {}, targetDbName = {}", connString, password, targetDbName);
-        CleanUpBefore();
+
+        if(needClean) {
+            CleanUpBefore();
+        }
 
         Connection connection = null;
 
-        log.info("We are starting the Performance test...");
+        log.info("We are starting the {} test...", testName);
         Instant start = Instant.now();
 
         try {
-            connection = DriverManager.getConnection(connString);
-            Statement statement = connection.createStatement();
+            connection = DriverManager.getConnection(connString, "", password);
 
-            String sqlAttachNewDb;
-            if (password.isEmpty()) {
-                Object[] params = new Object[]{targetDbName};
-                sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget", params);
-            } else {
-                Object[] params = new Object[]{targetDbName, password};
-                sqlAttachNewDb = MessageFormat.format("ATTACH DATABASE ''{0}'' AS newtarget KEY ''{1}''", params);
-            }
-
-
-            log.debug("SQL statement to attach new db file: " + sqlAttachNewDb);
-            statement.execute(sqlAttachNewDb);
-            statement.execute("CREATE TABLE newtarget.attribTable AS SELECT * FROM attribTable;");
-            statement.execute("CREATE TABLE newtarget.blobTable AS SELECT * FROM blobTable;");
-            statement.execute("DETACH DATABASE newtarget;");
-            statement.close();
+            consumer.accept(connection);
         } catch(SQLException e) {
             // if the error message is "out of memory",
             // it probably means no database file is found
@@ -66,7 +51,7 @@ public class PerformanceTester {
 
                 Instant finish = Instant.now();
                 long timeElapsed = Duration.between(start, finish).toMillis();
-                log.info("Testing is done.  Time elapsed: " + timeElapsed + " ms to generate " + targetDbName);
+                log.info("{} testing is done.  Time elapsed: {} ms", testName, timeElapsed);
             } catch(SQLException e) {
                 // connection close failed.
                 log.error(e.getMessage());
