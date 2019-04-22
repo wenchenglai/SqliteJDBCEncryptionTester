@@ -1,7 +1,9 @@
 package com.kla.bbp.jdbctester;
 
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.sqlite.SQLiteConnection;
 
 import java.io.File;
 import java.sql.Connection;
@@ -12,7 +14,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.BiConsumer;
 
+
 @Log4j2
+@Data
 public class Tester {
     @Value("${spring.connectionString:jdbc:sqlite:source.db}")
     private String connString;
@@ -30,7 +34,8 @@ public class Tester {
             CleanUpBefore();
         }
 
-        Connection connection = null;
+        //Connection connection = null;
+        SQLiteConnection connection = null;
 
         String sqlAttachNewDb;
         if (password.isEmpty()) {
@@ -45,7 +50,10 @@ public class Tester {
         Instant start = Instant.now();
 
         try {
-            connection = DriverManager.getConnection(connString, "", password);
+            //connection = DriverManager.getConnection(connString, "", password);
+            connection = (SQLiteConnection)DriverManager.getConnection(connString, "", password);
+            //connection = DriverManager.getConnection(connString);
+
 
             consumer.accept(connection, sqlAttachNewDb);
         } catch(SQLException e) {
@@ -68,7 +76,7 @@ public class Tester {
         }
     }
 
-    private void CleanUpBefore() {
+    protected void CleanUpBefore() {
         File file = new File(targetDbName);
         if(file.delete()){
             log.info("The target db File {} existed and has been deleted.", this.targetDbName);

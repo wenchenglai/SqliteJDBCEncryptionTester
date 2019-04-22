@@ -12,7 +12,7 @@ public class DecryptionTester extends Tester {
         this.TesterWrapper((connection, sqlAttach) -> {
             try {
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM company LIMIT 1");
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM Company LIMIT 1");
                 resultSet.next();
                 String name = resultSet.getString("name");
                 log.info("Data fetched from encrypted SQLite file (should be KLA): " + name);
@@ -28,8 +28,8 @@ public class DecryptionTester extends Tester {
             try {
                 log.info("Testing with wrong password...");
                 Statement statement = connection.createStatement();
-                statement.execute(String.format("PRAGMA key='%s'", "wrong"));
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM company LIMIT 1");
+                statement.execute(String.format("PRAGMA key='%s'", "wrong-password"));
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM Company LIMIT 1");
                 resultSet.next();
                 String name = resultSet.getString("name");
                 log.info("Data fetched from encrypted SQLite file (you are not supposed to see this KLA): " + name);

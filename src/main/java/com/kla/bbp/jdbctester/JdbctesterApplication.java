@@ -22,7 +22,7 @@ public class JdbctesterApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		//performanceTester.GenerateNewDb();
+		//performanceTester.ConvertFromEncryptedToClearText();
 		encryptionTester.EncryptNewDb();
 		decryptionTester.DecryptNewDb();
 		decryptionTester.DecryptNewDbWithWrongPassword();
