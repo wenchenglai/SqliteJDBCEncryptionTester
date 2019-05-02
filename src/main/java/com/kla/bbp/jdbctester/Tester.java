@@ -35,6 +35,9 @@ public class Tester {
         }
 
         //Connection connection = null;
+
+
+
         SQLiteConnection connection = null;
 
         String sqlAttachNewDb;
@@ -50,10 +53,16 @@ public class Tester {
         Instant start = Instant.now();
 
         try {
+
             //connection = DriverManager.getConnection(connString, "", password);
             connection = (SQLiteConnection)DriverManager.getConnection(connString, "", password);
-            //connection = DriverManager.getConnection(connString);
 
+            if (SQLiteConnection.hasEncryptionCapability()) {
+                log.info("JDBC Encryption is enabled.");
+            } else {
+                log.info("JDBC Encryption is disabled.");
+            }
+            //connection = DriverManager.getConnection(connString);
 
             consumer.accept(connection, sqlAttachNewDb);
         } catch(SQLException e) {
